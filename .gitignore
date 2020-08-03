@@ -1,0 +1,5 @@
+.idea
+*.iml
+
+# for Maven
+jedis-distributed-lock/target/
