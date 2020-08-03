@@ -34,7 +34,7 @@ lock.forceUnlock();//暴力解锁，异步方式forceUnlockAsync()
 ```
 
 
-API的整体使用非常简单，当然，如果你并不想直接使用JedisY API来使用分布式锁，而是基于springboot，jedisY还提供有注解的方式实现对分布式锁的支持。
+API的整体使用非常简单，当然，如果你并不想直接使用API来使用分布式锁，而是基于springboot，那么还提供有注解的方式实现对分布式锁的支持。
 首先我们需要定义好config，如下所示：
 ```Java
 @Bean
