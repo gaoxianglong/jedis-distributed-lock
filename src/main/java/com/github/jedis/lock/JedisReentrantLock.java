@@ -23,7 +23,7 @@ import java.util.concurrent.*;
 import java.util.concurrent.locks.LockSupport;
 
 /**
- * 分布式可重入锁实现
+ * 单点可重入锁实现
  *
  * @author gao_xianglong@sina.com
  * @version 0.1-SNAPSHOT

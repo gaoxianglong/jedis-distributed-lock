@@ -50,6 +50,7 @@ public class LockTest {
         try {
             //同步获取重入锁，当前线程如果获取锁资源失败则一直阻塞直至成功
             lock.lock();
+            lock.lock();
             System.out.println("Get lock success...");
         } finally {
             lock.unlock();

@@ -37,9 +37,6 @@ import java.lang.reflect.Method;
 @Aspect
 @Component
 public class LockAspect {
-    public LockAspect(){
-        System.out.println("====111=======");
-    }
     @Resource
     private JedisLockManager jedisLockManager;
 
