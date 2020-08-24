@@ -21,12 +21,16 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
 import redis.clients.jedis.JedisPoolConfig;
 
+import java.util.Objects;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -39,16 +43,14 @@ public class LockBySpring {
     public static void main(String[] args) {
         ConfigurableApplicationContext context = SpringApplication.run(LockBySpring.class, args);
         User user = (User) context.getBean("user");
-        new Thread(() -> {
-            user.testA();
-        }).start();
-        new Thread(() -> {
-            user.testA();
-        }).start();
+        ExecutorService executorService = Executors.newFixedThreadPool(10);
+        executorService.execute(() -> user.testA());
+        executorService.execute(() -> user.testA());
+        executorService.execute(() -> System.out.println(String.format("response:%s", user.testD("Hello jedis-lock"))));
     }
-
 }
 
+@ComponentScan("com.github.jedis")
 @Configuration
 class SpringConfiguration {
     @Bean
@@ -83,10 +85,17 @@ class User {
     @DistributedLock(name = "mylock")
     public void testC() {
         try {
-            TimeUnit.SECONDS.sleep(2);
             System.out.println(String.format("thread:%s get lock", Thread.currentThread().getName()));
+            TimeUnit.SECONDS.sleep(2);
         } catch (InterruptedException e) {
             //...
         }
+    }
+
+    @DistributedLock(name = "mylock2")
+    public String testD(String str) {
+        Objects.requireNonNull(str);
+        System.out.println(String.format("request:%s", str));
+        return str;
     }
 }

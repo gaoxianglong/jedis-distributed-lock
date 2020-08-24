@@ -22,6 +22,7 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -48,7 +49,7 @@ public class LockAspect {
     }
 
     @Around("interceptor()")
-    public void before(ProceedingJoinPoint joinPoint) {
+    public Object before(ProceedingJoinPoint joinPoint) {
         Class targetClass = joinPoint.getTarget().getClass();
         //获取目标入参的参数类型
         Class<?>[] types = ((MethodSignature) joinPoint.getSignature()).getParameterTypes();
@@ -70,7 +71,7 @@ public class LockAspect {
                                 throw new AcquireLockException("Unable to acquire distributed lock");
                             }
                     }
-                    joinPoint.proceed(joinPoint.getArgs());//执行目标方法
+                     return joinPoint.proceed(joinPoint.getArgs());//执行目标方法
                 } finally {
                     lock.unlock();//无论如何都要尝试释放
                 }
@@ -79,5 +80,6 @@ public class LockAspect {
             throw e instanceof AcquireLockException ? new JedisLockException("Try again", e)
                     : new RuntimeException(e);//所有异常抛出
         }
+        return null;
     }
 }
