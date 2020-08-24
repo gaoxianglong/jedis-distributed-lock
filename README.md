@@ -12,7 +12,7 @@ JedisLockManager manager = new JedisLockManager(cluster or poll);
 JedisLock lock = manager.getLock("mylock");
 ```
 
-JedisLockManager为重量级对象，全局仅需创建一次即可。当然，如果Redis的部署的是非集群环境（比如：Single、Master/Slave），JedisLockManager的入参还支持直接传递Pool。
+JedisLockManager为重量级对象，全局仅需创建一次即可。当然，如果redis的部署的是非集群环境（比如：Single、Master/Slave），JedisLockManager的入参还支持直接传递Pool。
 
 假设成功获取到JedisLock对象后，分布式锁的相关操作API如下所示：
 ```Java
@@ -39,7 +39,19 @@ lock.unlock();
 
 lock.forceUnlock();//暴力解锁，异步方式forceUnlockAsync()
 ```
-### 基于springboot
+
+## red-lock
+red-lock的使用和single-lock保持一致，只是在初始JedisLockManager时需要注意，如果入参是Pool或JedisCluster时则缺省使用single-lock；如果入参为List<Pool>时则使用red-lock加锁。red-lock要求redis节点必须独立部署、各个节点之间无状态，无需主从拷贝、集群管理介入。声明如下所示：
+```Java
+JedisPoolConfig config = new JedisPoolConfig();
+//TODO 省却数据源配置
+JedisLockManager manager = new JedisLockManager(Arrays.asList(new JedisPool(config, "127.0.0.1", 6379),
+        new JedisPool(config, "127.0.0.1", 6380),
+        new JedisPool(config, "127.0.0.1", 6381)));
+lock = manager.getLock("mylock");
+```
+
+## 基于springboot
 API的整体使用非常简单，当然，如果你并不想直接使用API来使用分布式锁，而是希望基于springboot，那么还提供有@annotation的方式实现对lock的支持。
 首先我们需要定义好config，如下所示：
 ```Java
