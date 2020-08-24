@@ -1,11 +1,18 @@
 # jedis-distributed-lock
-jedis分布式锁(可重入)
+架构设计文档：
+```shell
+[高容错性分布式锁架构设计方案 -01](https://xie.infoq.cn/article/4d571787a3280ef3094338f9b)
+[高容错性分布式锁架构设计方案 -02](https://xie.infoq.cn/article/545a3accd173d6517ebd0ad59)
+```
 
-提供有JedisLockManager类，如果大家在程序中需要使用到分布式锁，那么则可以使用如下方式创建JedisLock对象，如下所示：
+## single-lock
+提供有JedisLockManager类，如果大家在程序中需要使用到lock，则可以使用如下方式创建JedisLock对象，如下所示：
+```java
 JedisLockManager manager = new JedisLockManager(cluster or poll);
 JedisLock lock = manager.getLock("mylock");
+```
 
-JedisLockManager为重量级对象，全局仅需创建一次即可。当然，如果使用的是非集群环境（比如：单机、主备），JedisLockManager的入参还支持传递Pool。
+JedisLockManager为重量级对象，全局仅需创建一次即可。当然，如果Redis的部署的是非集群环境（比如：Single、Master/Slave），JedisLockManager的入参还支持直接传递Pool。
 
 假设成功获取到JedisLock对象后，分布式锁的相关操作API如下所示：
 ```Java
@@ -32,15 +39,25 @@ lock.unlock();
 
 lock.forceUnlock();//暴力解锁，异步方式forceUnlockAsync()
 ```
-
-
-API的整体使用非常简单，当然，如果你并不想直接使用API来使用分布式锁，而是基于springboot，那么还提供有注解的方式实现对分布式锁的支持。
+### 基于springboot
+API的整体使用非常简单，当然，如果你并不想直接使用API来使用分布式锁，而是希望基于springboot，那么还提供有@annotation的方式实现对lock的支持。
 首先我们需要定义好config，如下所示：
 ```Java
-@Bean
-public JedisLockManager jedisLockManager() {
-    JedisLockManager jedisLockManager = new JedisLockManager(jedisCluster());
-    return jedisLockManager;
+@ComponentScan("com.github.jedis")
+@Configuration
+class SpringConfiguration {
+    @Bean
+    public JedisCluster jedisCluster() {
+        JedisPoolConfig poolConfig = new JedisPoolConfig();
+        //TODO 省略数据源配置
+        return new JedisCluster(new HostAndPort("127.0.0.1", 6379), poolConfig);
+    }
+
+    @Bean
+    public JedisLockManager jedisLockManager() {
+        JedisLockManager jedisLockManager = new JedisLockManager(jedisCluster());
+        return jedisLockManager;
+    }
 }
 ```
 
