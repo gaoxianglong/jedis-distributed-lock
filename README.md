@@ -1,9 +1,7 @@
 # jedis-distributed-lock
 架构设计文档：
-```shell
 [高容错性分布式锁架构设计方案 -01](https://xie.infoq.cn/article/4d571787a3280ef3094338f9b)
 [高容错性分布式锁架构设计方案 -02](https://xie.infoq.cn/article/545a3accd173d6517ebd0ad59)
-```
 
 ## single-lock
 提供有JedisLockManager类，如果大家在程序中需要使用到lock，则可以使用如下方式创建JedisLock对象，如下所示：
