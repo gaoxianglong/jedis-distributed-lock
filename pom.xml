@@ -9,7 +9,7 @@
     <properties>
         <java-version>1.8</java-version>
         <jedis-version>2.9.0</jedis-version>
-        <springboot-version>2.1.1.RELEASE</springboot-version>
+        <springboot-version>2.2.11.RELEASE</springboot-version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <build>
